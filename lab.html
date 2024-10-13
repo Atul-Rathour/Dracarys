@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cheerful Biscuit Stacker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            touch-action: none;
+            font-family: 'Luckiest Guy', cursive;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: x-large;
+            font-family: 'Luckiest Guy', cursive;
+            color: rgb(237, 237, 202);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #backgroundImage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            object-fit: cover;
+        }
+
+        #landingPage,
+        #endingPage {
+            background-image: url('./assets/home-bg.jpg');
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        @media (max-width: 768px) {
+
+            #landingPage,
+            #endingPage {
+                background-image: url('./assets/home-bg-mobile.jpg');
+            }
+        }
+
+        #startButton,
+        #restartButton,
+        #homeButton {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: xx-large;
+            background-color: transparent;
+            border: 5px solid rgb(162, 14, 61);
+            border-radius: 10px;
+            color: rgb(237, 237, 202);
+        }
+
+        #restartButton {}
+
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 10px;
+            color: rgb(237, 237, 202);
+            text-shadow: 2px 2px rgb(116, 116, 116);
+            text-transform: uppercase;
+            border: 3px solid rgb(162, 14, 61);
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-weight: 600;
+            font-size: 30px;
+            font-family: 'Luckiest Guy', cursive;
+            background-color: transparent;
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        button:active {
+            transform: scale(0.9);
+            transition: all 100ms ease;
+        }
+
+        button img {
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+
+        .play {
+            transition: all 0.5s ease;
+            transition-delay: 300ms;
+        }
+
+        button:hover img {
+            transform: scale(3) translate(120%);
+        }
+
+        .now {
+            position: absolute;
+            left: 0;
+            transform: translateX(-100%);
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+
+        button:hover .now {
+            transform: translateX(10px);
+            transition-delay: 300ms;
+        }
+
+        button:hover .play {
+            transform: translateX(200%);
+            transition-delay: 300ms;
+        }
+
+        #endingPage {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        #finalScore {
+            font-size: 48px;
+            color: rgb(237, 237, 202);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+
+
+        #musicToggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: transparent;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .card {
+            background-color: tan;
+            border-radius: 10px;
+            height: fit-content;
+            padding: 20px;
+            margin: 10px;
+            animation: slideIn 1s ease-out forwards;
+            transform: translateY(100vh);
+            box-shadow: 8px 8px 16px #000,
+                -8px -8px 16px #000;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 0.9;
+            }
+        }
+
+        .confetti {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background-color: hsl(39, 100%, 56%);
+            top: 0;
+            opacity: 0;
+            animation: makeItRain 3000ms infinite linear;
+        }
+
+        .confetti-piece:nth-child(1) {
+            left: 7%;
+            transform: rotate(-10deg);
+            animation-delay: 182ms;
+            animation-duration: 2000ms;
+        }
+
+        .confetti-piece:nth-child(2) {
+            left: 14%;
+            transform: rotate(20deg);
+            animation-delay: 161ms;
+            animation-duration: 2076ms;
+        }
+
+        .confetti-piece:nth-child(3) {
+            left: 21%;
+            transform: rotate(-51deg);
+            animation-delay: 481ms;
+            animation-duration: 2103ms;
+        }
+
+        .confetti-piece:nth-child(4) {
+            left: 28%;
+            transform: rotate(61deg);
+            animation-delay: 334ms;
+            animation-duration: 1008ms;
+        }
+
+        .confetti-piece:nth-child(5) {
+            left: 35%;
+            transform: rotate(-52deg);
+            animation-delay: 302ms;
+            animation-duration: 1776ms;
+        }
+
+        .confetti-piece:nth-child(6) {
+            left: 42%;
+            transform: rotate(38deg);
+            animation-delay: 180ms;
+            animation-duration: 1168ms;
+        }
+
+        .confetti-piece:nth-child(7) {
+            left: 49%;
+            transform: rotate(11deg);
+            animation-delay: 395ms;
+            animation-duration: 1200ms;
+        }
+
+        .confetti-piece:nth-child(8) {
+            left: 56%;
+            transform: rotate(49deg);
+            animation-delay: 14ms;
+            animation-duration: 1887ms;
+        }
+
+        .confetti-piece:nth-child(9) {
+            left: 63%;
+            transform: rotate(-72deg);
+            animation-delay: 149ms;
+            animation-duration: 1805ms;
+        }
+
+        .confetti-piece:nth-child(10) {
+            left: 70%;
+            transform: rotate(10deg);
+            animation-delay: 351ms;
+            animation-duration: 2059ms;
+        }
+
+        .confetti-piece:nth-child(11) {
+            left: 77%;
+            transform: rotate(4deg);
+            animation-delay: 307ms;
+            animation-duration: 1132ms;
+        }
+
+        .confetti-piece:nth-child(12) {
+            left: 84%;
+            transform: rotate(42deg);
+            animation-delay: 464ms;
+            animation-duration: 1776ms;
+        }
+
+        .confetti-piece:nth-child(13) {
+            left: 91%;
+            transform: rotate(-72deg);
+            animation-delay: 429ms;
+            animation-duration: 1818ms;
+        }
+
+        .confetti-piece:nth-child(14) {
+            left: 94%;
+            transform: rotate(-72deg);
+            animation-delay: 429ms;
+            animation-duration: 818ms;
+        }
+
+        .confetti-piece:nth-child(15) {
+            left: 96%;
+            transform: rotate(-72deg);
+            animation-delay: 429ms;
+            animation-duration: 2818ms;
+        }
+
+        .confetti-piece:nth-child(16) {
+            left: 98%;
+            transform: rotate(-72deg);
+            animation-delay: 429ms;
+            animation-duration: 2818ms;
+        }
+
+        .confetti-piece:nth-child(17) {
+            left: 50%;
+            transform: rotate(-72deg);
+            animation-delay: 429ms;
+            animation-duration: 2818ms;
+        }
+
+        .confetti-piece:nth-child(18) {
+            left: 60%;
+            transform: rotate(-72deg);
+            animation-delay: 429ms;
+            animation-duration: 1818ms;
+        }
+
+        .confetti-piece:nth-child(odd) {
+            background-color: hsl(0, 100%, 67%);
+        }
+
+        .confetti-piece:nth-child(even) {
+            z-index: 1;
+        }
+
+        .confetti-piece:nth-child(4n) {
+            width: 6px;
+            height: 14px;
+            animation-duration: 4000ms;
+            background-color: #c33764;
+        }
+
+        .confetti-piece:nth-child(5n) {
+            width: 3px;
+            height: 10px;
+            animation-duration: 4000ms;
+            background-color: #b06ab3;
+        }
+
+        .confetti-piece:nth-child(3n) {
+            width: 4px;
+            height: 12px;
+            animation-duration: 2500ms;
+            animation-delay: 3000ms;
+            background-color: #dd2476;
+        }
+
+        .confetti-piece:nth-child(3n-7) {
+            background-color: hsl(166, 100%, 37%);
+        }
+
+        @keyframes makeItRain {
+            from {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(250px);
+            }
+        }
+
+        @keyframes jiggle {
+            0% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(1.08);
+            }
+        }
+
+
+        #logo {
+            animation: jiggle 0.5s ease-in-out infinite alternate;
+        }
+
+
+        @keyframes rotate1 {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
+        .biscuit {
+            animation: rotate1 2s linear infinite;
+
+        }
+
+        #quitButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 20px;
+            background-color: rgba(162, 14, 61, 0.7);
+            border: 3px solid rgb(237, 237, 202);
+            border-radius: 10px;
+            color: rgb(237, 237, 202);
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #quitButton:hover {
+            background-color: rgba(162, 14, 61, 1);
+        }
+    </style>
+</head>
+
+<body>
+    <button id="musicToggle">🔊</button>
+
+    <div id="landingPage">
+
+        <div style="text-align: center;" class="card">
+            <img src="./assets/logo.png" alt="Logo" id="logo" style="height: 70px;">
+            <p>
+                Move your mouse or finger to control the plate at the bottom of the screen. <br><br>
+                Catch falling biscuit pieces in the correct order: base, cream, and top. <br><br>
+                Stack three pieces correctly to score a point. <br><br>
+                If you catch a piece in the wrong order, your stack will fall off! <br><br>
+                You have 120 seconds to score as many points as possible. <br><br>
+            </p>
+            <br>
+            <div style="display: flex;align-items: center;justify-content: center;">
+                <button id="startButton">
+                    <img src="./assets/jim-jam.png" class="biscuit" style="height: 25px;" alt="">
+                    <span class="now">now!</span>
+                    <span class="play">play</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="gameArea" style="display: none;">
+        <img id="backgroundImage" src="assets/game-bg.jpg" alt="Background">
+        <div id="info">Score: <span id="score">0</span> | Time: <span id="time">120</span></div>
+        <button id="quitButton">Quit</button>
+    </div>
+    <div id="endingPage">
+        <div class="confetti">
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+        </div>
+        <div class="card">
+
+            <div id="finalScore">Your Final Score: <span id="endScore"></span></div>
+            <div style="display: flex; align-items:center; justify-content: center; position: relative; z-index: 10; ">
+                <button id="restartButton">
+                    <img src="./assets/jim-jam.png" style="height: 25px;" alt="">
+                    <span class="now">again!</span>
+                    <span class="play">play</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let scene, camera, renderer, plate, score = 0, timeLeft = 120;
+            let fallingObjects = [];
+            const plateStack = [];
+            let homeAudio, gameAudio, bellAudio;
+            let isMusicPlaying = true;
+            let animationId;
+
+            const musicToggle = document.getElementById('musicToggle');
+
+            function initAudio() {
+                homeAudio = new Audio('./assets/Jim-Jam Stacking Game.mp3');
+                homeAudio.loop = true;
+                gameAudio = new Audio('./assets/Ukulele Whistle.wav');
+                gameAudio.loop = true;
+                bellAudio = new Audio('./assets/Bells Logo.wav');
+            }
+
+            function isMobile() {
+                return window.innerWidth <= 768;
+            }
+
+            function setBackgroundImage() {
+                const landingPage = document.getElementById('landingPage');
+                const endingPage = document.getElementById('endingPage');
+                const gameAreaBg = document.getElementById('backgroundImage');
+
+                if (isMobile()) {
+                    landingPage.style.backgroundImage = "url('./assets/home-bg-mobile.jpg')";
+                    endingPage.style.backgroundImage = "url('./assets/home-bg-mobile.jpg')";
+                    gameAreaBg.src = "assets/game-bg-mobile.jpg";
+                } else {
+                    landingPage.style.backgroundImage = "url('./assets/home-bg.jpg')";
+                    endingPage.style.backgroundImage = "url('./assets/home-bg.jpg')";
+                    gameAreaBg.src = "assets/game-bg.jpg";
+                }
+            }
+
+            function toggleMusic() {
+                isMusicPlaying = !isMusicPlaying;
+                musicToggle.textContent = isMusicPlaying ? '🔊' : '🔇';
+
+                if (isMusicPlaying) {
+                    if (document.getElementById('gameArea').style.display === 'none') {
+                        homeAudio.play();
+                    } else {
+                        gameAudio.play();
+                    }
+                } else {
+                    homeAudio.pause();
+                    gameAudio.pause();
+                }
+            }
+
+            function init() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setClearColor(0x000000, 0);
+                document.body.appendChild(renderer.domElement);
+
+                const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.6);
+                scene.add(ambientLight);
+
+                const directionalLight = new THREE.DirectionalLight(0xFFFFA0, 0.8);
+                directionalLight.position.set(5, 10, 7);
+                scene.add(directionalLight);
+
+                plate = createPlate();
+                scene.add(plate);
+
+                camera.position.z = 5;
+            }
+
+            function createPlate() {
+                const geometry = new THREE.CylinderGeometry(0.8, 0.8, 0.1, 32);
+                const material = new THREE.MeshPhongMaterial({ color: 0xFFA500, shininess: 100 });
+                const plate = new THREE.Mesh(geometry, material);
+                plate.position.y = -2;
+                return plate;
+            }
+
+            function createFallingObject() {
+                const types = ['base', 'cream', 'top'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                let object;
+
+                switch (type) {
+                    case 'base':
+                        object = createBase();
+                        break;
+                    case 'cream':
+                        object = createCream();
+                        break;
+                    case 'top':
+                        object = createTop();
+                        break;
+                }
+
+                object.userData.type = type;
+                object.position.set((Math.random() - 0.5) * 3, 3, 0);
+                fallingObjects.push(object);
+                scene.add(object);
+            }
+
+            function createBase() {
+                const geometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32);
+                const material = new THREE.MeshPhongMaterial({ color: 0xD2691E, shininess: 30 });
+                return new THREE.Mesh(geometry, material);
+            }
+
+            function createCream() {
+                const geometry = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 32);
+                const material = new THREE.MeshPhongMaterial({ color: 0xFFFACD, shininess: 50 });
+                return new THREE.Mesh(geometry, material);
+            }
+
+            function createTop() {
+                const group = new THREE.Group();
+
+                const topGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32);
+                const topMaterial = new THREE.MeshPhongMaterial({ color: 0xD2691E, shininess: 30 });
+                const topMesh = new THREE.Mesh(topGeometry, topMaterial);
+                group.add(topMesh);
+
+                const jamGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+                const jamMaterial = new THREE.MeshPhongMaterial({ color: 0xFF0000, shininess: 80 });
+                const jam = new THREE.Mesh(jamGeometry, jamMaterial);
+                jam.position.y = 0.05;
+                group.add(jam);
+
+                return group;
+            }
+
+            function onPointerMove(event) {
+                event.preventDefault();
+                let clientX = event.clientX || (event.touches && event.touches[0].clientX);
+                const x = (clientX / window.innerWidth) * 2 - 1;
+                const newX = x * 3;
+                const deltaX = newX - plate.position.x;
+                plate.position.x = newX;
+
+                plateStack.forEach(obj => {
+                    obj.position.x += deltaX;
+                });
+            }
+
+            function updateTimer() {
+                timeLeft--;
+                document.getElementById('time').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }
+
+            function endGame() {
+                gameAudio.pause();
+                if (isMusicPlaying) homeAudio.play();
+                document.getElementById('gameArea').style.display = 'none';
+                document.getElementById('endingPage').style.display = 'flex';
+                document.getElementById('endScore').textContent = score;
+            }
+
+            function quitGame() {
+                gameAudio.pause();
+                if (isMusicPlaying) homeAudio.play();
+                document.getElementById('gameArea').style.display = 'none';
+                document.getElementById('endingPage').style.display = 'flex';
+                document.getElementById('endScore').textContent = score;
+
+                cleanupGame();
+            }
+
+            function animate(time) {
+                animationId = requestAnimationFrame(animate);
+                TWEEN.update(time);
+
+                fallingObjects.forEach((obj, index) => {
+                    obj.position.y -= 0.05;
+                    obj.rotation.y += 0.02;
+
+                    if (obj.position.y < -2 && Math.abs(obj.position.x - plate.position.x) < 0.5) {
+                        scene.remove(obj);
+                        fallingObjects.splice(index, 1);
+
+                        if (checkStack(obj.userData.type)) {
+                            plateStack.push(obj);
+                            obj.position.y = -1.9 + (plateStack.length - 1) * 0.1;
+                            obj.position.x = plate.position.x;
+                            scene.add(obj);
+
+                            new TWEEN.Tween(obj.position)
+                                .to({ y: obj.position.y + 0.1 }, 100)
+                                .easing(TWEEN.Easing.Bounce.Out)
+                                .start();
+
+                            if (plateStack.length === 3) {
+                                if (isMusicPlaying) bellAudio.play();
+                                score += 100;
+                                document.getElementById('score').textContent = score;
+
+                                plateStack.forEach((stackObj, i) => {
+                                    new TWEEN.Tween(stackObj.position)
+                                        .to({ y: stackObj.position.y + 1 }, 500)
+                                        .easing(TWEEN.Easing.Cubic.Out)
+                                        .onComplete(() => {
+                                            scene.remove(stackObj);
+                                            if (i === plateStack.length - 1) {
+                                                plateStack.length = 0;
+                                            }
+                                        })
+                                        .start();
+
+                                    new TWEEN.Tween(stackObj.rotation)
+                                        .to({ y: Math.PI * 2 }, 500)
+                                        .start();
+                                });
+                            }
+                        } else {
+                            plateStack.forEach(stackObj => {
+                                new TWEEN.Tween(stackObj.position)
+                                    .to({ y: -5 }, 1000)
+                                    .easing(TWEEN.Easing.Bounce.Out)
+                                    .onComplete(() => scene.remove(stackObj))
+                                    .start();
+
+                                new TWEEN.Tween(stackObj.rotation)
+                                    .to({ x: Math.random() * Math.PI * 2, z: Math.random() * Math.PI * 2 }, 1000)
+                                    .start();
+                            });
+                            plateStack.length = 0;
+                        }
+                    } else if (obj.position.y < -3) {
+                        scene.remove(obj);
+                        fallingObjects.splice(index, 1);
+                    }
+                });
+
+                renderer.render(scene, camera);
+            }
+
+            function checkStack(type) {
+                if (plateStack.length === 0 && type === 'base') return true;
+                if (plateStack.length === 1 && plateStack[0].userData.type === 'base' && type === 'cream') return true;
+                if (plateStack.length === 2 && plateStack[0].userData.type === 'base' && plateStack[1].userData.type === 'cream' && type === 'top') return true;
+                return false;
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                setBackgroundImage();
+            }
+
+            function startGame() {
+                homeAudio.pause();
+                if (isMusicPlaying) gameAudio.play();
+
+                document.getElementById('landingPage').style.display = 'none';
+                document.getElementById('gameArea').style.display = 'block';
+                init();
+                animate();
+
+                document.addEventListener('mousemove', onPointerMove);
+                document.addEventListener('touchmove', onPointerMove);
+                document.addEventListener('touchstart', onPointerMove);
+
+                setInterval(createFallingObject, 1000);
+                setInterval(updateTimer, 1000);
+            }
+
+            function resetGame() {
+                score = 0;
+                timeLeft = 120;
+                document.getElementById('score').textContent = '0';
+                document.getElementById('time').textContent = '120';
+
+                cleanupGame();
+
+                gameAudio.currentTime = 0;
+                homeAudio.currentTime = 0;
+            }
+
+            function cleanupGame() {
+                if (scene) {
+                    while (scene.children.length > 0) {
+                        scene.remove(scene.children[0]);
+                    }
+                }
+                fallingObjects = [];
+                plateStack.length = 0;
+                if (renderer) {
+                    renderer.dispose();
+                    document.body.removeChild(renderer.domElement);
+                }
+                cancelAnimationFrame(animationId);
+
+                document.removeEventListener('mousemove', onPointerMove);
+                document.removeEventListener('touchmove', onPointerMove);
+                document.removeEventListener('touchstart', onPointerMove);
+            }
+
+            initAudio();
+            setBackgroundImage();
+            window.addEventListener('resize', onWindowResize, false);
+            musicToggle.addEventListener('click', toggleMusic);
+            document.getElementById('startButton').addEventListener('click', startGame);
+            document.getElementById('restartButton').addEventListener('click', () => {
+                resetGame();
+                document.getElementById('endingPage').style.display = 'none';
+                startGame();
+            });
+            document.getElementById('quitButton').addEventListener('click', quitGame);
+
+            // Start playing home audio
+            if (isMusicPlaying) homeAudio.play();
+        }); let homeAudio, gameAudio;
+        // homeAudio.play();
+        // homeAudio.loop = true;
+        let scene, camera, renderer, plate, score = 0, timeLeft = 120;
+        let fallingObjects = [];
+        const plateStack = [];
+        let isMusicPlaying = true;
+        let animationId;
+
+
+        function initAudio() {
+            homeAudio = new Audio('./assets/Jim-Jam Stacking Game.mp3');
+            homeAudio.loop = true;
+            gameAudio = new Audio('./assets/Ukulele Whistle.wav');
+            gameAudio.loop = true;
+        }
+
+        const musicToggle = document.getElementById('musicToggle');
+
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        function setBackgroundImage() {
+            const landingPage = document.getElementById('landingPage');
+            const endingPage = document.getElementById('endingPage');
+            const gameAreaBg = document.getElementById('backgroundImage');
+
+            if (isMobile()) {
+                landingPage.style.backgroundImage = "url('./assets/home-bg-mobile.jpg')";
+                endingPage.style.backgroundImage = "url('./assets/home-bg-mobile.jpg')";
+                gameAreaBg.src = "assets/game-bg-mobile.jpg";
+            } else {
+                landingPage.style.backgroundImage = "url('./assets/home-bg.jpg')";
+                endingPage.style.backgroundImage = "url('./assets/home-bg.jpg')";
+                gameAreaBg.src = "assets/game-bg.jpg";
+            }
+        }
+
+        setBackgroundImage();
+        window.addEventListener('resize', setBackgroundImage);
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                homeAudio.pause();
+                if (gameAudio) gameAudio.pause();
+                musicToggle.textContent = '🔇';
+            } else {
+                if (document.getElementById('gameArea').style.display === 'none') {
+                    homeAudio.play();
+                } else if (gameAudio) {
+                    gameAudio.play();
+                }
+                musicToggle.textContent = '🔊';
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+        musicToggle.addEventListener('click', toggleMusic);
+
+        function init() {
+            // Reset scene and camera when the game restarts
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            document.body.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xFFFFA0, 0.8);
+            directionalLight.position.set(5, 10, 7);
+            scene.add(directionalLight);
+
+            plate = createPlate();
+            scene.add(plate);
+
+            camera.position.z = 5;
+
+            document.addEventListener('mousemove', onPointerMove);
+            document.addEventListener('touchmove', onPointerMove);
+            document.addEventListener('touchstart', onPointerMove);
+
+            setInterval(createFallingObject, 1000);
+            setInterval(updateTimer, 1000);
+
+            window.addEventListener('resize', onWindowResize, false);
+
+            document.getElementById('quitButton').addEventListener('click', quitGame);
+        }
+
+        function createPlate() {
+            const geometry = new THREE.CylinderGeometry(0.8, 0.8, 0.1, 32);
+            const material = new THREE.MeshPhongMaterial({ color: 0xFFA500, shininess: 100 });
+            const plate = new THREE.Mesh(geometry, material);
+            plate.position.y = -2;
+            return plate;
+        }
+
+        function createFallingObject() {
+            const types = ['base', 'cream', 'top'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            let object;
+
+            switch (type) {
+                case 'base':
+                    object = createBase();
+                    break;
+                case 'cream':
+                    object = createCream();
+                    break;
+                case 'top':
+                    object = createTop();
+                    break;
+            }
+
+            object.userData.type = type;
+            object.position.set((Math.random() - 0.5) * 3, 3, 0);
+            fallingObjects.push(object);
+            scene.add(object);
+        }
+
+        function createBase() {
+            const geometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32);
+            const material = new THREE.MeshPhongMaterial({ color: 0xD2691E, shininess: 30 });
+            return new THREE.Mesh(geometry, material);
+        }
+
+        function createCream() {
+            const geometry = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 32);
+            const material = new THREE.MeshPhongMaterial({ color: 0xFFFACD, shininess: 50 });
+            return new THREE.Mesh(geometry, material);
+        }
+
+        function createTop() {
+            const group = new THREE.Group();
+
+            const topGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32);
+            const topMaterial = new THREE.MeshPhongMaterial({ color: 0xD2691E, shininess: 30 });
+            const topMesh = new THREE.Mesh(topGeometry, topMaterial);
+            group.add(topMesh);
+
+            const jamGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+            const jamMaterial = new THREE.MeshPhongMaterial({ color: 0xFF0000, shininess: 80 });
+            const jam = new THREE.Mesh(jamGeometry, jamMaterial);
+            jam.position.y = 0.05;
+            group.add(jam);
+
+            return group;
+        }
+
+        function onPointerMove(event) {
+            event.preventDefault();
+            let clientX;
+
+            if (event.type === 'touchmove' || event.type === 'touchstart') {
+                clientX = event.touches[0].clientX;
+            } else {
+                clientX = event.clientX;
+            }
+
+            const x = (clientX / window.innerWidth) * 2 - 1;
+            const newX = x * 3;
+            const deltaX = newX - plate.position.x;
+            plate.position.x = newX;
+
+            plateStack.forEach(obj => {
+                obj.position.x += deltaX;
+            });
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('time').textContent = timeLeft;
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            gameAudio.pause();
+            if (isMusicPlaying) homeAudio.play();
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('endingPage').style.display = 'flex';
+            document.getElementById('endScore').textContent = score;
+        }
+
+        function quitGame() {
+            gameAudio.pause();
+            if (isMusicPlaying) homeAudio.play();
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('endingPage').style.display = 'flex';
+            document.getElementById('endScore').textContent = score;
+
+            // Clean up the game state
+            scene.remove.apply(scene, scene.children);
+            fallingObjects = [];
+            plateStack.length = 0;
+            renderer.dispose();
+            cancelAnimationFrame(animationId);
+        }
+
+        function animate(time) {
+            animationId = requestAnimationFrame(animate);
+            TWEEN.update(time);
+
+            fallingObjects.forEach((obj, index) => {
+                obj.position.y -= 0.05;
+                obj.rotation.y += 0.02;
+
+                if (obj.position.y < -2 && Math.abs(obj.position.x - plate.position.x) < 0.5) {
+                    scene.remove(obj);
+                    fallingObjects.splice(index, 1);
+
+                    if (checkStack(obj.userData.type)) {
+                        plateStack.push(obj);
+                        obj.position.y = -1.9 + (plateStack.length - 1) * 0.1;
+                        obj.position.x = plate.position.x;
+                        scene.add(obj);
+
+                        new TWEEN.Tween(obj.position)
+                            .to({ y: obj.position.y + 0.1 }, 100)
+                            .easing(TWEEN.Easing.Bounce.Out)
+                            .start();
+
+                        if (plateStack.length === 3) {
+                            const bell = new Audio('./assets/Bells Logo.wav')
+                            bell.play();
+                            score += 100;
+                            document.getElementById('score').textContent = score;
+
+                            plateStack.forEach((stackObj, i) => {
+                                new TWEEN.Tween(stackObj.position)
+                                    .to({ y: stackObj.position.y + 1 }, 500)
+                                    .easing(TWEEN.Easing.Cubic.Out)
+                                    .onComplete(() => {
+                                        scene.remove(stackObj);
+                                        if (i === plateStack.length - 1) {
+                                            plateStack.length = 0;
+                                        }
+                                    })
+                                    .start();
+
+                                new TWEEN.Tween(stackObj.rotation)
+                                    .to({ y: Math.PI * 2 }, 500)
+                                    .start();
+                            });
+                        }
+                    } else {
+                        plateStack.forEach(stackObj => {
+                            new TWEEN.Tween(stackObj.position)
+                                .to({ y: -5 }, 1000)
+                                .easing(TWEEN.Easing.Bounce.Out)
+                                .onComplete(() => scene.remove(stackObj))
+                                .start();
+
+                            new TWEEN.Tween(stackObj.rotation)
+                                .to({ x: Math.random() * Math.PI * 2, z: Math.random() * Math.PI * 2 }, 1000)
+                                .start();
+                        });
+                        plateStack.length = 0;
+                    }
+                } else if (obj.position.y < -3) {
+                    scene.remove(obj);
+                    fallingObjects.splice(index, 1);
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        function checkStack(type) {
+            if (plateStack.length === 0 && type === 'base') return true;
+            if (plateStack.length === 1 && plateStack[0].userData.type === 'base' && type === 'cream') return true;
+            if (plateStack.length === 2 && plateStack[0].userData.type === 'base' && plateStack[1].userData.type === 'cream' && type === 'top') return true;
+            return false;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            setBackgroundImage();
+        }
+
+        // function startGame() {
+        //     homeAudio.pause();
+        //     gameAudio = new Audio('./assets/Ukulele Whistle.wav');
+        //     gameAudio.loop = true;
+        //     if (isMusicPlaying) gameAudio.play();
+
+        //     document.getElementById('landingPage').style.display = 'none';
+        //     document.getElementById('gameArea').style.display = 'block';
+        //     init();
+        //     animate();
+        // }
+
+        function startGame() {
+            if (homeAudio) homeAudio.pause();
+            if (!gameAudio) initAudio();
+            if (isMusicPlaying) gameAudio.play();
+
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            init();
+            animate();
+        }
+
+        // function resetGame() {
+        //     // Reset game variables
+        //     score = 0;
+        //     timeLeft = 120;
+
+        //     // Reset the score and time on the UI
+        //     document.getElementById('score').textContent = '0';
+        //     document.getElementById('time').textContent = '120';
+
+        //     // Clear any existing falling objects and plate stack
+        //     fallingObjects.forEach(obj => scene.remove(obj));
+        //     plateStack.forEach(obj => scene.remove(obj));
+        //     fallingObjects = [];
+        //     plateStack.length = 0;
+        // }
+
+
+        function resetGame() {
+            score = 0;
+            timeLeft = 120;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('time').textContent = '120';
+
+            if (scene) {
+                fallingObjects.forEach(obj => scene.remove(obj));
+                plateStack.forEach(obj => scene.remove(obj));
+                fallingObjects = [];
+                plateStack.length = 0;
+            }
+
+            if (gameAudio) {
+                gameAudio.pause();
+                gameAudio.currentTime = 0;
+            }
+            if (homeAudio) {
+                homeAudio.pause();
+                homeAudio.currentTime = 0;
+            }
+
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            // init();
+            animate();
+
+        }
+
+
+        document.getElementById('startButton').addEventListener('click', startGame);
+
+        document.getElementById('restartButton').addEventListener('click', () => {
+            console.log('here')
+            resetGame();
+            document.getElementById('endingPage').style.display = 'none';
+        });
+    </script>
+</body>
+
+</html>
